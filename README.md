@@ -4,7 +4,7 @@
 * Initial version: 2017-05-29
 * License: [GPLv3](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
-**This Docker configuration generates a fully configured JupterHub server, with optional persistent folders, and support for Python3, R, Octave and BASH Jupyter Notebooks.**
+**This Docker configuration generates a fully configured JupterHub server, with simplified user management, optional persistent folders, and support for Python3, R, Octave and BASH Jupyter Notebooks.**
 
 ![Logos](logos.png)
 
