@@ -12,7 +12,7 @@ Configuration:
 
 * **configurable users** (listed in a file)
 * **secured by HTTPS** (options: auto-signed certificates, classic certifcates, or using letsencrpyt)
-* **optioanl persistent folders**: personal and shared folders on the host
+* **optional persistent folders**: personal and shared folders on the host
 * Jupyter languages support:
   * **Python3** : matplotlib, numpy, networkx, pandas, seaborn, posgresql, hdf5, spqrql, ipythonwidgets...
   * **R-Project** : ggplot2, knitr, rmarkdown
@@ -31,7 +31,7 @@ Additional tools (accessible from the Jupyter terminal and BASH notebooks):
 
 # Getting started
 
-## Intall docker
+## Install docker
 
 This depend on you the host system (see [full documentation](https://docs.docker.com/engine/installation/)). On Ubuntu systems just:
 
@@ -82,18 +82,18 @@ An alternative, the container may be executed with an interactive BASH shell. Th
     bash add_shared_folders.py
     jupyterhub -f jupyterhub_config.py 
 
-Finnally in any case noavigate using with the host's browser to:
+Finally in any case navigate using with the host's browser to:
 
     https://localhost:8001
     
-* Note1: if using an auto-signed certificate, you have to override the security warning in your browser.
-* Note2: default user is "admin" with password "asdf1234" (if you have not, you should change that; users can be defined in the notebooks/users file, one per line, following the syntax user:password
+* Note 1: if using an auto-signed certificate, you have to override the security warning in your browser.
+* Note 2: default user is "admin" with password "asdf1234" (if you have not, you should change that; users can be defined in the notebooks/users file, one per line, following the syntax user:password
 
 # Additional documentation
 
 ## User management
 * users are created by the script create_users.py
-  * this scirts creates the users listed in the file "notebooks/users"
+  * this script creates the users listed in the file "notebooks/users"
   * in this file add one user per line using the syntax user:password
 * in notebooks/jupyter_config.py : 
   * admins are defined at the line:
@@ -130,7 +130,7 @@ In the "share" folder of the host create one folder for each user (using user na
 
 
 ### Existing certificate
-Alternatively you may use a proper pair of key/certificate. In this case name them cert.pem and key-no-passwd.pem. Pay attention that the key must not be protected by a passphrase (the second openssl command just above is a way to remove the passphrase of an existing key).
+Alternatively you may use a proper pair of key/certificate. In this case name them cert.pem and key-no-passwd.pem. Pay attention that the key must not be protected by a pass phrase (the second openssl command just above is a way to remove the pass phrase of an existing key).
 
 The key and certificates to use are defined in the notebooks/jupyterhub_config_autosigned.py like so:
 
