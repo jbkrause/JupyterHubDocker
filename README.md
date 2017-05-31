@@ -70,11 +70,11 @@ Run jupyterhub without persisting folder:
 
 Run jupyterhub in the container using persistent folders (you have to specify the path on host by replacing /path/to/host/share in the line below):
 
-    sudo docker run -it -p 8001:8000 -v ``pwd``/persistent/:/persistent jankrause/jupyterhub bash runjupyterhub_with_share.bash
+    sudo docker run -it -p 8001:8000 -v `pwd`/persistent/:/persistent jankrause/jupyterhub bash runjupyterhub_with_share.bash
 
 An alternative, the container may be executed with an interactive BASH shell. This allows you to make temporary modifications to the system before running jupyterhub:
 
-    sudo docker run -it -p 8001:8000 -v ``pwd``/persistent/:/persistent jankrause/jupyterhub bash runjupyterhub
+    sudo docker run -it -p 8001:8000 -v `pwd`/persistent/:/persistent jankrause/jupyterhub bash runjupyterhub
     # do some adjustments
     # - create users
     # - install applications
