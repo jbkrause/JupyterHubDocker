@@ -84,7 +84,7 @@ An alternative, the container may be executed with an interactive BASH shell. Th
 
 Finally in any case navigate using with the host's browser to:
 
-    https://localhost:8001
+    https://127.0.0.1:8001
     
 * Note 1: if using an auto-signed certificate, you have to override the security warning in your browser.
 * Note 2: default user is "admin" with password "asdf1234" (if you have not, you should change that; users can be defined in the notebooks/users file, one per line, following the syntax user:password
