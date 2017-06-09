@@ -14,7 +14,7 @@ Configuration:
 * **secured by HTTPS** (options: auto-signed certificates, classic certifcates, or using letsencrpyt)
 * **optional persistent folders**: personal and shared folders on the host
 * Jupyter languages support:
-  * **Python3** : matplotlib, numpy, networkx, pandas, seaborn, posgresql, hdf5, spqrql, ipythonwidgets...
+  * **Python3** : matplotlib, numpy, networkx, pandas, scikit-learn, seaborn, posgresql, hdf5, spqarql, ipythonwidgets...
   * **R-Project** : ggplot2, knitr, rmarkdown
   * **Octave**
   * **BASH**

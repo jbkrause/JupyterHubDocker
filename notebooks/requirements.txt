@@ -24,4 +24,5 @@ virtualenv==15.0.1
 jupyter==1.0.0
 jupyterhub==0.7.2
 octave_kernel==0.26.2
-
+sklearn==0.0
+sklearn-pandas==1.4.0
