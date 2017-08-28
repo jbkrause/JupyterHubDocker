@@ -1,28 +1,32 @@
 import os
 import sys
 
+share = 'Share'
+common =  'Common'
+personal = 'MyFolder'
+
 # test if the persisnt is mounted
 if not os.path.isdir('/persistent'):
     print('Persistent folder "/persistent" does not exist (it was probaly not mounted).')
     sys.exit()
 
 # the shared folder /persistent/share is owned by admin, others can just read
-if not os.path.isdir('/persistent/share'):
-    os.system('mkdir /persistent/share')
-os.system('chown -R admin:users /persistent/share')
-os.system('chmod -R 777 /persistent/share')
-os.system('setfacl -dm u::rwx,g::rwx,o::rwx /persistent/share')
+if not os.path.isdir('/persistent/'+share):
+    os.system('mkdir /persistent/'+share)
+os.system('chown -R admin:users /persistent/'+share)
+os.system('chmod -R 777 /persistent/'+share)
+os.system('setfacl -dm u::rwx,g::rwx,o::rwx /persistent/'+share)
 
 # the admin user folder must contain a users folder
 if not os.path.isdir('/home/admin/UsersFolder/'):
     os.system('mkdir /home/admin/UsersFolder/')
 
 # the common folder /persitent/share is owned by admin, others can read and write
-if not os.path.isdir('/persistent/common'):
-    os.system('mkdir /persistent/common')
-os.system('chown -R admin:users /persistent/common')
-os.system('chmod -R 755 /persistent/common')
-os.system('setfacl -dm u::rwx,g::rx,o::rx /persistent/common')
+if not os.path.isdir('/persistent/'+common):
+    os.system('mkdir /persistent/'+common)
+os.system('chown -R admin:users /persistent/'+common)
+os.system('chmod -R 755 /persistent/'+common)
+os.system('setfacl -dm u::rwx,g::rx,o::rx /persistent/'+common)
 
 def create_user_folder(user, addShare=True, addCommonFolder=True):
 
@@ -35,16 +39,16 @@ def create_user_folder(user, addShare=True, addCommonFolder=True):
     os.system(cmd)
 
     # the user persistent folder
-    if addShare and not os.path.isdir('/home/%s/MyFolder' % (user,)):
-        os.system('su %s -c "ln -s /persistent/%s /home/%s/MyFolder"' % (user, user, user,))
+    if addShare and not os.path.isdir('/home/%s/%s' % (user,personal)):
+        os.system('su %s -c "ln -s /persistent/%s /home/%s/%s"' % (user, user, user, personal))
     
     # the shared folder /persistent/share is owned by admin, others can just read
     if addShare and not os.path.isdir('/home/%s/SharedFolder' % (user,)):
-        os.system('su %s -c "ln -s /persistent/share /home/%s/SharedFolder"' % (user, user,))
+        os.system('su %s -c "ln -s /persistent/%s /home/%s/%s"' % (user, share, user, share))
 
     # the common folder /persistent/common is owned by admin, others can read and write
-    if addCommonFolder and not os.path.isdir('/home/%s/CommonFolder' % (user,)):
-        os.system('su %s -c "ln -s /persistent/common /home/%s/CommonFolder"' % (user, user,))
+    if addCommonFolder and not os.path.isdir('/home/%s/%s' % (user,common)):
+        os.system('su %s -c "ln -s /persistent/%s /home/%s/%s"' % (user, common, user, common))
 
     # add the user folder into the admin folder
     if not os.path.isdir('/home/admin/UsersFolder/%s' % (user,)):

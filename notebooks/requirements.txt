@@ -10,7 +10,6 @@ jsonschema==2.6.0
 matplotlib==2.0.0
 mpld3==0.3
 ssh-import-id==5.5
-numpy==1.11.0
 h5py==2.7.0
 pandas==0.17.1
 py-postgresql==1.1.0

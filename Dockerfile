@@ -32,6 +32,7 @@ RUN apt-get -yqq install python3-pip
 RUN apt-get -yqq install python3-pil
 RUN apt-get -yqq install python3-requests
 RUN apt-get -yqq install python3-dev
+RUN apt-get -yqq install python3-numpy
 RUN apt-get -yqq install npm
 RUN apt-get -yqq install nodejs-legacy
 RUN npm install -g configurable-http-proxy
@@ -62,6 +63,12 @@ RUN python3 create_users.py
 #RUN apt-get -yqq update
 #RUN apt-get -yqq install certbot
 #RUN python3 ssl_certbot.py
+
+# Make sensitive scripts Read-Only
+RUN chmod -R 700 /opt/notebooks
+
+# Change root password
+RUN echo "root:asdf1234" | chpasswd
 
 # expose port
 EXPOSE 8000

@@ -41,7 +41,9 @@ This depend on you the host system (see [full documentation](https://docs.docker
 ## Configuration
 
 ### Users
-Edit the file ./notebooks/users . Add a user per line. Syntax, a user per line usging the format: user:password . The user `admin` is mandatory.
+Edit the file ./notebooks/users . Add a user per line. Syntax, a user per line usging the format: user:password . The user `admin` is mandatory. Default for admin password is "asdf1234".
+
+Container system root password is changed via Dockerfile, the default is "asdf1234".
 
 ### HTTPS configuration
 
@@ -71,6 +73,10 @@ Run jupyterhub without persisting folder:
 Run jupyterhub in the container using persistent folders (you have to specify the path on host by replacing /path/to/host/share in the line below):
 
     sudo docker run -it -p 8001:8000 -v `pwd`/persistent/:/persistent jankrause/jupyterhub bash runjupyterhub_with_share.bash
+
+For production, the container can be executed via the deamon (so it is notably restarted automatically at host system reboot):
+
+    sudo docker run -dit --restart always -p 443:8000 -v `pwd`/persistent/:/persistent jankrause/jupyterhub bash runjupyterhub_with_share.bash
 
 An alternative, the container may be executed with an interactive BASH shell. This allows you to make temporary modifications to the system before running jupyterhub:
 
