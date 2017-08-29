@@ -22,6 +22,7 @@ RUN apt-get -yqq install vim
 RUN apt-get -yqq install mc
 RUN apt-get -yqq install imagemagick
 RUN apt-get -yqq install texlive
+RUN apt-get -yqq install texlive-xetex
 RUN apt-get -yqq install texlive-latex-extra
 RUN apt-get -yqq install pandoc 
 RUN apt-get -yqq install rsync
