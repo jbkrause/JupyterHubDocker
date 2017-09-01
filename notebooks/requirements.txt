@@ -25,3 +25,6 @@ jupyterhub==0.7.2
 octave_kernel==0.26.2
 sklearn==0.0
 sklearn-pandas==1.4.0
+nltk==3.2.4
+word2vec==0.9.1
+elasticsearch===5.4.0

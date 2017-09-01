@@ -58,6 +58,9 @@ RUN jupyter nbextension enable --py --sys-prefix widgetsnbextension
 ### users creation (based on the file notebooks/users) ###
 RUN python3 create_users.py
 
+### extract elasticsearch
+RUN unzip elasticsearch-5.5.2.zip
+
 # Install Certbot (ssl certificat generation based on the file notebooks/domain)
 #RUN apt-get -yqq install software-properties-common
 #RUN add-apt-repository -y ppa:certbot/certbot
