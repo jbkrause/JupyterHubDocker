@@ -8,6 +8,7 @@ httplib2==0.9.1
 ipywidgets==6.0.0
 jsonschema==2.6.0
 matplotlib==2.0.0
+pydot==1.2.3
 mpld3==0.3
 ssh-import-id==5.5
 h5py==2.7.0
