@@ -13,11 +13,12 @@ Configuration:
 * **configurable users** (listed in a file)
 * **secured by HTTPS** (options: auto-signed certificates, classic certifcates, or using letsencrpyt)
 * **optional persistent folders**: personal and shared folders on the host
-* Jupyter languages support:
-  * **Python3** : matplotlib, numpy, networkx, pandas, seaborn, posgresql, hdf5, spqarql, scikit-learn, nltk, elasticsearch ipythonwidgets...
+* Jupyter languages made available:
+  * **Python3** : matplotlib, numpy, networkx, pandas, seaborn, posgresql, hdf5, spqarql, scikit-learn, nltk, elasticsearch, ipythonwidgets...
   * **R-Project** : ggplot2, knitr, rmarkdown
   * **Octave**
   * **BASH**
+  * **Javascript**
 
 Additional tools (accessible from the Jupyter terminal and BASH notebooks):
 
@@ -46,13 +47,6 @@ Edit the file ./notebooks/users . Add a user per line. Syntax, a user per line u
 Container system root password is changed via Dockerfile, the default is "asdf1234".
 
 ### HTTPS configuration
-
-Use self-signed ssl certificates (some are provided by default, if you do not want to create yours skip this section). Generate auto-signed SSL certificate:
-
-    cd notebooks
-    openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 10000
-    openssl rsa -in key.pem -out key-no-passwd.pem 
-    cd ..
 
 For other options, see below in the section `Alternative SSL configurations`.
 
@@ -121,7 +115,7 @@ Installed CRAN packages are listed in the file notebooks/install_r.bash . You ma
 
 When re-building or even re-executing the Docker container, e.g. at a system reboot or to add some new user or python package, all user data is destroyed. This can be useful for temporary systems, e.g. for one day trainings. 
 
-For persisting configurations, you may want to mount an external filesystem, e.g. a folder of the host system:
+For production configurations, you may want to have the data stored in the host filesystem system (or any host mount point):
 
     sudo docker run -it -p 8001:8000 -v `pwd`/persistent/:/persistent jankrause/jupyterhub
     sudo docker run -it -p 8001:8000 -v `pwd`/persistent/:/persistent jankrause/jupyterhub runjupyterhub_with_share.bash
@@ -133,8 +127,16 @@ In the "share" folder of the host create one folder for each user (using user na
 
 ## Alternative SSL configurations
 
+## Use a custom made SSL certificate
 
-### Existing certificate
+A selfsigned SSL certificates are provided by default. But you can generate your own self-signed SSL certificate to:
+
+    cd notebooks
+    openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 10000
+    openssl rsa -in key.pem -out key-no-passwd.pem 
+    cd ..
+
+### Use valid SSL certificate
 Alternatively you may use a proper pair of key/certificate. In this case name them cert.pem and key-no-passwd.pem. Pay attention that the key must not be protected by a pass phrase (the second openssl command just above is a way to remove the pass phrase of an existing key).
 
 The key and certificates to use are defined in the notebooks/jupyterhub_config_autosigned.py like so:
@@ -167,7 +169,7 @@ Then, you will have to start jupyterhub with the folloing command:
 
 ### ElasticSearch
 
-Elasticsearch is not included in this docker Image, but it can be executed in another container on the. To download the official conatiner:
+Elasticsearch is not included in this docker image, but it can be executed within in another Docker container on the host. To download the official conatiner:
 
     sudo docker pull elasticsearch
     
@@ -175,8 +177,8 @@ Elasticsearch is not included in this docker Image, but it can be executed in an
 Then run elasticsearch and link the jupyterhub container in the same docker network
 
     sudo docker network create jupyterhubnet
-    sudo docker run -d -p 9200:9200 -p 9300:9300 --name elastic --net jupyterhubnet elasticsearch
-    sudo docker run -d -p 8005:8000 -v `pwd`/persistent/:/persistent --net jupyterhubnet jankrause/jupyterhub runjupyterhub_with_share.bash
+    sudo docker run -d --restart always -p 9200:9200 -p 9300:9300 --name elastic --net jupyterhubnet elasticsearch
+    sudo docker run -d --restart always -p 8005:8000 -v `pwd`/persistent/:/persistent --net jupyterhubnet jankrause/jupyterhub runjupyterhub_with_share.bash
     
 With that configuration, the ElasticSearch service will be reachable form JupyterHub using the 'elastic' host name on pourt 9200 (default). From a Python notebook, it can be accessed the following way :
 
@@ -184,8 +186,8 @@ With that configuration, the ElasticSearch service will be reachable form Jupyte
     es = Elasticsearch('http://elastic:9200')
 
 
-Elasticsearch data can also be persisted on host: 
+ElasticSearch data can also be persisted on the host (or any host mount point): 
 
     sudo docker network create jupyterhubnet
-    sudo docker run -d -p 9200:9200 -p 9300:9300 -v `pwd`/elasticdata/:/usr/share/elasticsearch/data --name elastic --net jupyterhubnet elasticsearch
-    sudo docker run -d -p 8005:8000 -v `pwd`/persistent/:/persistent --net jupyterhubnet jankrause/jupyterhub runjupyterhub_with_share.bash
+    sudo docker run -d --restart always -p 9200:9200 -p 9300:9300 -v `pwd`/elasticdata/:/usr/share/elasticsearch/data --name elastic --net jupyterhubnet elasticsearch
+    sudo docker run -d --restart always -p 8005:8000 -v `pwd`/persistent/:/persistent --net jupyterhubnet jankrause/jupyterhub runjupyterhub_with_share.bash
