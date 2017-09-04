@@ -39,7 +39,7 @@ def create_user_folder(user, addShare=True, addCommonFolder=True):
     os.system(cmd)
 
     # the user persistent folder
-    if addShare and not os.path.isdir('/home/%s/%s' % (user,personal)):
+    if True and not os.path.isdir('/home/%s/%s' % (user,personal)):
         os.system('su %s -c "ln -s /persistent/%s /home/%s/%s"' % (user, user, user, personal))
     
     # the shared folder /persistent/share is owned by admin, others can just read

@@ -76,7 +76,7 @@ RUN python3 create_users.py
 #RUN python3 ssl_certbot.py
 
 # Make sensitive scripts Read-Only
-RUN chmod -R 700 /opt/notebooks
+RUN chmod -R 700 /opt/notebooks/users
 
 # Change root password
 RUN echo "root:asdf1234" | chpasswd
