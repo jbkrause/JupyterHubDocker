@@ -24,11 +24,13 @@ RUN apt-get -yqq install mc
 RUN apt-get -yqq install imagemagick
 RUN apt-get -yqq install texlive
 RUN apt-get -yqq install texlive-latex-extra
+RUN apt-get -yqq install texlive-xetex
 RUN apt-get -yqq install pandoc 
 RUN apt-get -yqq install graphviz
 RUN apt-get -yqq install rsync
 RUN apt-get -yqq install curl
 RUN apt-get -yqq install nmap
+RUN apt-get -yqq install wget
 
 ### installing python packages and building pandas ###
 RUN apt-get -yqq install python3-pip
@@ -56,6 +58,8 @@ RUN pip3 install gnuplot_kernel
 
 ### installing R-project ###
 RUN bash install_r.bash
+
+### install bash kernel ###
 RUN python3 -m bash_kernel.install
 
 ### installing IJavascript

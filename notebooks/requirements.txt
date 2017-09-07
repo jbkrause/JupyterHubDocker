@@ -13,6 +13,7 @@ mpld3==0.3
 ssh-import-id==5.5
 h5py==2.7.0
 pandas==0.17.1
+sympy==1.1.1
 py-postgresql==1.1.0
 pytz==2014.10
 seaborn==0.7.1
@@ -26,6 +27,7 @@ jupyterhub==0.7.2
 octave_kernel==0.26.2
 sklearn==0.0
 sklearn-pandas==1.4.0
+scikit-image==0.13.0
 nltk==3.2.4
 word2vec==0.9.1
 elasticsearch===5.4.0
