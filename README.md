@@ -1,20 +1,22 @@
-# JupyterHub Docker Configuration
+# JupyterHub Docker
 
-* Author: Jan Krause
-* Initial version: 2017-05-29
-* License: [GPLv3](https://www.gnu.org/licenses/gpl-3.0.en.html)
+* Author : Jan Krause
+* Initial version : 2017-05-29
+* Version 1.0.0 : 2017-09-18
+* License : [GPLv3](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
-**This Docker configuration generates a fully configured JupterHub server, with simplified user management, optional persistent folders, and support for Python3, R, Octave, Javascript and BASH Jupyter Notebooks.**
+** This Docker configuration generates a fully configured JupterHub server**, with::
+* simplified user management, 
+* persistent folders: personal folders (private), shared folder (anybody can edit), read-only folder (only admin can modiy),
+* Jupyter secured by HTTPS
+* HTTP service of the "Shared" folder, for publication (e.g. diffusion via http://nbviewer.jupyter.org)
+* User can access their folders remotely and securely via SFTP
+* ready to interoperate with Postgresql and ElasticSearch containers
 
 ![Logos](logos.png)
 
-Configuration: 
-
-* **configurable users** (listed in a file)
-* **secured by HTTPS** (options: auto-signed certificates, classic certifcates, or using letsencrpyt)
-* **optional persistent folders**: personal and shared folders on the host
-* Jupyter languages made available:
-  * **Python3** : matplotlib, numpy, networkx, pandas, seaborn, posgresql, hdf5, spqarql, scikit-learn, nltk, elasticsearch, postgresql, ipythonwidgets...
+* Defaull packages:
+  * **Python3** : matplotlib, numpy, networkx, pandas, seaborn, sqlalchemy (notably posgresql), hdf5, spqarql, scikit-learn, nltk, elasticsearch, ipythonwidgets...
   * **R-Project** : ggplot2, knitr, rmarkdown
   * **Octave**
   * **BASH**
@@ -24,7 +26,7 @@ Additional tools (accessible from the Jupyter terminal and BASH notebooks):
 
 * shells: sh, bash
 * editors: vi, vim, nano, emacs
-* network: ssh, wget, rsync, curl, nmap
+* network: ssh (client and server), wget, rsync, curl, nmap, pgsql (postgresql)
 * file management: midnight commander
 * images: ImageMagick
 * computational workflow: SnakeMake
@@ -32,23 +34,41 @@ Additional tools (accessible from the Jupyter terminal and BASH notebooks):
 
 # Getting started
 
-## Install docker
+## Quick start using pre-build image
 
-This depend on you the host system (see [full documentation](https://docs.docker.com/engine/installation/)). On Ubuntu systems just:
+Download:
 
-    sudo apt update
-    sudo apt install docker.io
+    docker pull jankrause/jupyterhub
 
-## Configuration
+Run (the container will restart automatically when host reboots):
+
+    sudo docker run -d --restart always -p 80:80 -p 443:8000 -p 222:22 -v /opt/JupyterHubDocker/persistent/:/persistent --net jupyterhubnet jankrause/jupyterhub bash runjupyterhub.bash
+
+Access to JupyterHub from a web browser:
+
+    * https://127.0.0.1
+    * Add a security exception, this is necessary since the SSL certificate was autosigned (see below how to install proper certificates)
+    * Administration: user 'admin' ; password 'asdf1234'
+    * Users: user1, user2 ... user15 ; passwords 'asdf1234'
+
+Public access to the files in the 'Sahre' folder:
+
+    * http://127.0.0./example.ipynb
+
+Administration via SSH from host:
+
+    * ssh -p 222 root@127.0.0.1
+    * password: 'asdf1234'
+
+## Build form source
 
 ### Users
+
 Edit the file ./notebooks/users . Add a user per line. Syntax, a user per line usging the format: user:password . The user `admin` is mandatory. Default for admin password is "asdf1234".
 
 Container system root password is changed via Dockerfile, the default is "asdf1234".
 
-### HTTPS configuration
-
-For other options, see below in the section `Alternative SSL configurations`.
+Important note: you should change the root password, that is defined in the Dockerfile, defaul is 'asdf1234'.
 
 ## Build Docker image
 
@@ -60,31 +80,13 @@ Goto directory containing this docker file and execute:
 
 There are several ways to run the container:
 
-Run jupyterhub without persisting folder:
+Run jupyterhub:
 
-    sudo docker run -it -p 8001:8000 jankrause/jupyterhub bash runjupyterhub.bash
-
-Run jupyterhub in the container using persistent folders (you have to specify the path on host by replacing /path/to/host/share in the line below):
-
-    sudo docker run -it -p 8001:8000 -v `pwd`/persistent/:/persistent jankrause/jupyterhub bash runjupyterhub_with_share.bash
-
-For production, the container can be executed via the deamon (so it is notably restarted automatically at host system reboot):
-
-    sudo docker run -dit --restart always -p 443:8000 -v `pwd`/persistent/:/persistent jankrause/jupyterhub bash runjupyterhub_with_share.bash
-
-An alternative, the container may be executed with an interactive BASH shell. This allows you to make temporary modifications to the system before running jupyterhub:
-
-    sudo docker run -it -p 8001:8000 -v `pwd`/persistent/:/persistent jankrause/jupyterhub bash runjupyterhub
-    # do some adjustments
-    # - create users
-    # - install applications
-    # - ...
-    bash add_shared_folders.py
-    jupyterhub -f jupyterhub_config.py 
+    sudo docker run -d --restart always -p 80:80 -p 443:8000 -p 222:22 -v `pwd`/persistent/:/persistent --net jupyterhubnet jankrause/jupyterhub bash runjupyterhub.bash
 
 Finally in any case navigate using with the host's browser to:
 
-    https://127.0.0.1:8001
+    https://127.0.0.1
     
 * Note 1: if using an auto-signed certificate, you have to override the security warning in your browser.
 * Note 2: default user is "admin" with password "asdf1234" (if you have not, you should change that; users can be defined in the notebooks/users file, one per line, following the syntax user:password
@@ -111,23 +113,9 @@ The packages listed in notebooks/requirements.txt are installed using pip3. If y
 Installed CRAN packages are listed in the file notebooks/install_r.bash . You may add/remove/modify installed packages by editing the line beginning with `echo "install.packages`. Available packages are listed on the following website https://cran.r-project.org/web/packages/available_packages_by_name.html .
 
 
-## Mounting a volume (persistent folders)
+## SSL configuration
 
-When re-building or even re-executing the Docker container, e.g. at a system reboot or to add some new user or python package, all user data is destroyed. This can be useful for temporary systems, e.g. for one day trainings. 
-
-For production configurations, you may want to have the data stored in the host filesystem system (or any host mount point):
-
-    sudo docker run -it -p 8001:8000 -v `pwd`/persistent/:/persistent jankrause/jupyterhub
-    sudo docker run -it -p 8001:8000 -v `pwd`/persistent/:/persistent jankrause/jupyterhub runjupyterhub_with_share.bash
-    
-In the "share" folder of the host create one folder for each user (using user name) and an additional folder named "share". Then uncomment the following line in the docker file (by removing the leading hash "#"):
-    
-    RUN python3 add_shared_folders.py
-
-
-## Alternative SSL configurations
-
-## Use a custom made SSL certificate
+## Use a custom made self-signes SSL certificate
 
 A selfsigned SSL certificates are provided by default. But you can generate your own self-signed SSL certificate to:
 
@@ -136,23 +124,14 @@ A selfsigned SSL certificates are provided by default. But you can generate your
     openssl rsa -in key.pem -out key-no-passwd.pem 
     cd ..
 
-### Use valid SSL certificate
-Alternatively you may use a proper pair of key/certificate. In this case name them cert.pem and key-no-passwd.pem. Pay attention that the key must not be protected by a pass phrase (the second openssl command just above is a way to remove the pass phrase of an existing key).
+# Use valid SSL certificate
+Alternatively you may use a proper pair of key/certificate. In this case name them cert.pem and key-no-passwd.pem. Pay attention that the key must not be protected by a pass phrase. You may buy such certificates from specialized companies, e.g.Gandi.net .
 
 The key and certificates to use are defined in the notebooks/jupyterhub_config_autosigned.py like so:
 
     c.JupyterHub.ssl_cert = '/opt/notebooks/cert.pem'
     c.JupyterHub.ssl_key = '/opt/notebooks/key-no-passwd.pem'
 
-### Use Let's Encrypt (via Certbot)
-
-Retirements: ports 80 and 443 must be available for this to work, in other words you need to forward the to the host with the options -p 80:80 -p 443:443 when running the container.
-
-Edit the file notebooks/domain . Add your domain name on the first line. In the Dockerfile, uncomment the section under `# Inatall Certbot`.
-
-With this option, when running the container, you will have to execute:
-
-    sudo docker run -it -p 8001:8000 -p 80:80 -p 443:443 jupyterhub -f /opt/notebooks/jupyterhub_config_certbot.py
 
 ### Deactivate SSL
 
@@ -165,7 +144,7 @@ Then, you will have to start jupyterhub with the folloing command:
 
     sudo docker run -it -p 8001:8000 jupyterhub --no-ssl
 
-## Configuration with other Docker services
+## Configure compatible Docker services
 
 ### ElasticSearch
 
@@ -173,14 +152,13 @@ Elasticsearch is not included in this docker image, but it can be executed withi
 
     sudo docker pull elasticsearch
     
-    
 Then run elasticsearch and link the jupyterhub container in the same docker network
 
     sudo docker network create jupyterhubnet
     sudo docker run -d --restart always -p 9200:9200 -p 9300:9300 --name elastic --net jupyterhubnet elasticsearch
-    sudo docker run -d --restart always -p 8005:8000 -v `pwd`/persistent/:/persistent --net jupyterhubnet jankrause/jupyterhub runjupyterhub_with_share.bash
+    sudo docker run -d --restart always -p 80:80 -p 443:8000 -p 222:22 -v /opt/JupyterHubDocker/persistent/:/persistent --net jupyterhubnet jankrause/jupyterhub bash runjupyterhub.bash
     
-With that configuration, the ElasticSearch service will be reachable form JupyterHub using the 'elastic' host name on pourt 9200 (default). From a Python notebook, it can be accessed the following way :
+With that configuration, the ElasticSearch service will be reachable form JupyterHub using the 'elastic' host name on port 9200 (default). From a Python notebook, it can be accessed the following way :
 
     from elasticsearch import Elasticsearch
     es = Elasticsearch('http://elastic:9200')
@@ -190,4 +168,17 @@ ElasticSearch data can also be persisted on the host (or any host mount point):
 
     sudo docker network create jupyterhubnet
     sudo docker run -d --restart always -p 9200:9200 -p 9300:9300 -v `pwd`/elasticdata/:/usr/share/elasticsearch/data --name elastic --net jupyterhubnet elasticsearch
-    sudo docker run -d --restart always -p 8005:8000 -v `pwd`/persistent/:/persistent --net jupyterhubnet jankrause/jupyterhub runjupyterhub_with_share.bash
+    sudo docker run -d --restart always -p 80:80 -p 443:8000 -p 222:22 -v /opt/JupyterHubDocker/persistent/:/persistent --net jupyterhubnet jankrause/jupyterhub bash runjupyterhub.bash
+    
+## Postgresql
+
+The approach is similar as for ElasticSearch just above:
+
+    sudo docker pull postgres
+    sudo docker network create jupyterhubnet
+    sudo docker run -d --restart always --name postgres -e POSTGRES_PASSWORD=asdf1234 -p 5432:5432 --net jupyterhubnet  postgres
+    sudo docker run -d --restart always -p 80:80 -p 443:8000 -p 222:22 -v /opt/JupyterHubDocker/persistent/:/persistent --net jupyterhubnet jankrause/jupyterhub bash runjupyterhub.bash
+
+
+
+

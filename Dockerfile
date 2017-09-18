@@ -31,6 +31,9 @@ RUN apt-get -yqq install rsync
 RUN apt-get -yqq install curl
 RUN apt-get -yqq install nmap
 RUN apt-get -yqq install wget
+RUN apt-get -yqq install git
+RUN apt-get -yqq install postgresql-client
+RUN apt-get -yqq install openssh-server
 
 ### installing python packages and building pandas ###
 RUN apt-get -yqq install python3-pip
@@ -72,13 +75,6 @@ RUN jupyter nbextension enable --py --sys-prefix widgetsnbextension
 ### users creation (based on the file notebooks/users) ###
 RUN python3 create_users.py
 
-# Install Certbot (ssl certificat generation based on the file notebooks/domain)
-#RUN apt-get -yqq install software-properties-common
-#RUN add-apt-repository -y ppa:certbot/certbot
-#RUN apt-get -yqq update
-#RUN apt-get -yqq install certbot
-#RUN python3 ssl_certbot.py
-
 # Make sensitive scripts Read-Only
 RUN chmod -R 700 /opt/notebooks/users
 
@@ -89,9 +85,6 @@ RUN echo "root:asdf1234" | chpasswd
 EXPOSE 8000
 
 # start app
-#CMD ["jupyterhub", "-f", "jupyterhub_config.py"]
-#CMD ["bash", "runjupyterhub_with_share.bash"]
-CMD ["bash"]
-
+CMD ["jupyterhub", "-f", "jupyterhub_config.py"]
 
 
